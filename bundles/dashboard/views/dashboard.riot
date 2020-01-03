@@ -27,7 +27,6 @@
               </a>
               <div class="dropdown-menu dropdown-menu-right" aria-labelledby="select-dashboard">
                 <a href="#" each={ (dash, i) in props.dashboards } class={ classes({ 'dropdown-item' : true, 'active' : dashboard.get('id') === dash.id }) } onclick={ (e) => onSelect(e) }>
-                  <i if={ get('dash.name', '').length }>Untitled Dashboard</i>
                   { dash.name }
                 </a>
                 <div class="dropdown-divider"></div>
@@ -50,12 +49,13 @@
         </div>
       </div>
     </div>
-    <div is="eden-blocks" placement={ Object.assign({}, dashboard.get('placement') || {}) } position={ dashboard.get('id') } for="dashboard" blocks={ props.blocks } type={ props.type } on-save={ onPlacement } positions={ positions } { ...attributes } />
+    <eden-editable placement={ Object.assign({}, dashboard.get('placement') || {}) } position={ dashboard.get('id') } for="dashboard" blocks={ props.blocks } type={ props.type } on-save={ onPlacement } positions={ positions } { ...attributes } />
   </div>
 
   <script>
     // import base
     import Base from './js/base';
+    import Model from './js/model';
     import uuid from 'uuid';
 
     // export default
@@ -70,17 +70,20 @@
         // on before mount
         super.onBeforeMount(...arguments);
 
+        // model
+        Model(this);
+
         // bind methods
         this.onPlacement = this.onPlacement.bind(this);
 
         // set dashboards
-        this.dashboards = (props.dashboards || []).map((dash) => this.eden.get('model.get')('dashboard', dash.id, dash));
+        this.dashboards = (props.dashboards || []).map((dash) => this.model('dashboard', dash));
 
         // set update
         this.type       = props.type;
         this.preview    = true;
         this.updating   = {};
-        this.dashboard  = this.dashboards.length ? this.dashboards[0] : this.eden.get('model.get')('dashboard', null, {});
+        this.dashboard  = this.dashboards.length ? this.dashboards[0] : this.model('dashboard', {});
         this.attributes = {
           preview : this.preview
         };
@@ -101,7 +104,7 @@
         e.stopPropagation();
 
         // set dashboard
-        this.dashboard = this.eden.get('model.get')('dashboard', null, {});
+        this.dashboard = this.model('dashboard', {});
 
         // save dashboard
         await this.save(this.dashboard);
@@ -124,7 +127,7 @@
         e.stopPropagation();
 
         // set dashboard
-        this.dashboard = this.eden.get('model.get')('dashboard', e.item.dash.id, e.item.dash);
+        this.dashboard = this.model('dashboard', e.item.dash);
 
         // save
         this.update();
