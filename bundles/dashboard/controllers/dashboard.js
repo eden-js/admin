@@ -8,7 +8,7 @@ const Dashboard = model('dashboard');
 const Placement = model('editablePlacement');
 
 // require helpers
-const ModelHelper = helper('model');
+const modelHelper = helper('model');
 const BlockHelper = helper('cms/block');
 
 /**
@@ -84,7 +84,12 @@ class DashboardController extends Controller {
     opts.socket.join(`dashboard.${id}`);
 
     // add to room
-    return await ModelHelper.listen(opts.sessionID, await Dashboard.findById(id), uuid);
+    return await modelHelper.addListener(await Dashboard.findById(id), {
+      atomic    : true,
+      user      : opts.user,
+      listenID  : uuid,
+      sessionID : opts.sessionID,
+    });
   }
 
   /**
@@ -97,8 +102,16 @@ class DashboardController extends Controller {
    * @return {Async}
    */
   async liveDeafenAction(id, uuid, opts) {
+    // join room
+    opts.socket.leave(`dashboard.${id}`);
+
     // add to room
-    return await ModelHelper.deafen(opts.sessionID, await Dashboard.findById(id), uuid);
+    return await modelHelper.removeListener(await Dashboard.findById(id), {
+      atomic    : true,
+      user      : opts.user,
+      listenID  : uuid,
+      sessionID : opts.sessionID,
+    });
   }
 
   /**
