@@ -8,7 +8,7 @@ const Dashboard = model('dashboard');
 const Placement = model('editablePlacement');
 
 // require helpers
-const modelHelper = helper('model');
+const syncHelper  = helper('sync');
 const BlockHelper = helper('cms/block');
 
 /**
@@ -84,7 +84,7 @@ class DashboardController extends Controller {
     opts.socket.join(`dashboard.${id}`);
 
     // add to room
-    return await modelHelper.addListener(await Dashboard.findById(id), {
+    return await syncHelper.addListener(await Dashboard.findById(id), {
       atomic    : true,
       user      : opts.user,
       listenID  : uuid,
@@ -106,7 +106,7 @@ class DashboardController extends Controller {
     opts.socket.leave(`dashboard.${id}`);
 
     // add to room
-    return await modelHelper.removeListener(await Dashboard.findById(id), {
+    return await syncHelper.removeListener(await Dashboard.findById(id), {
       atomic    : true,
       user      : opts.user,
       listenID  : uuid,
