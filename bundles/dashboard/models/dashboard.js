@@ -14,11 +14,12 @@ class Dashboard extends Model {
   async sanitise(req) {
     // return dashboard
     return {
-      id        : this.get('_id') ? this.get('_id').toString() : null,
-      type      : this.get('type'),
-      name      : this.get('name'),
-      public    : !!this.get('public'),
-      placement : await this.get('placement') ? await (await this.get('placement')).sanitise(req) : null,
+      id          : this.get('_id') ? this.get('_id').toString() : null,
+      type        : this.get('type'),
+      name        : this.get('name'),
+      public      : !!this.get('public'),
+      placement   : await this.get('placement') ? await (await this.get('placement')).sanitise(req) : null,
+      description : this.get('description'),
     };
   }
 }
