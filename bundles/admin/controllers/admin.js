@@ -5,9 +5,6 @@ const Controller = require('controller');
 // require models
 const Dashboard = model('dashboard');
 
-// get helpers
-const blockHelper = helper('cms/block');
-
 /**
  * Create Admin Controller class. Only visible to people with the 'admin.view' role
  *
@@ -43,25 +40,11 @@ class AdminController extends Controller {
    * @priority 100
    */
   async indexAction(req, res) {
-    // get dashboards
-    const dashboards = await Dashboard.where({
-      type : 'admin.home',
-    }).or({
-      'user.id' : req.user.get('_id').toString(),
-    }, {
-      public : true,
-    }).find();
-
     // Render admin page
     res.render('admin', {
-      name       : 'Admin Home',
-      type       : 'admin.home',
-      blocks     : blockHelper.renderBlocks('admin'),
-      jumbotron  : `Welcome back, ${req.user.get('username')}!`,
-      dashboards : await Promise.all(dashboards.map(async (dashboard, i) => {
-        // return sanitise promise
-        return dashboard.sanitise(i === 0 ? req : null);
-      })),
+      name      : 'Admin Home',
+      type      : 'admin.home',
+      jumbotron : `Welcome back, ${req.user.get('username')}!`,
     });
   }
 
